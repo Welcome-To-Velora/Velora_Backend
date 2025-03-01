@@ -1,5 +1,5 @@
 import request from 'supertest';
-import app from '../backend/server'; // Ensure correct path
+import app from '../src/server'; // Ensure correct path
 
 let server;
 
