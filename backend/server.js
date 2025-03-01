@@ -12,6 +12,18 @@ const PORT = process.env.PORT || 1234;
 app.use("/api/auth", authRoutes);
 
 
-app.listen(PORT, () => {
-    console.log("Server running on http://localhost:" + PORT);
-});
+
+// Test Routes
+app.get("/api/health", (request, response) => {
+    response.status(200).json({ message: "Server is running" });
+  });
+
+
+export default app;
+
+if (process.env.NODE_ENV !== 'test') {
+    const PORT = process.env.PORT || 1234;
+    app.listen(PORT, () => {
+      console.log(`Server running on http://localhost:${PORT}`);
+    });
+  }
