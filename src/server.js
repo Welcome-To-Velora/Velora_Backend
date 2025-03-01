@@ -3,6 +3,8 @@ import dotenv from "dotenv";
 
 import authRoutes from "./routes/authRoutes.js";
 
+import { connectDB } from "./lib/db.js"
+
 dotenv.config();
 
 const app = express();
@@ -24,5 +26,7 @@ if (process.env.NODE_ENV !== 'test') {
     const PORT = process.env.PORT || 1234;
     app.listen(PORT, () => {
       console.log(`Server running on http://localhost:${PORT}`);
+      
+      connectDB();
     });
   }
