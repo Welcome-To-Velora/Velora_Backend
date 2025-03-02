@@ -1,5 +1,6 @@
 import User from "../models/UserModel.js";
 import { generateToken } from "../lib/utils.js";
+import { sendErrorResponse, validateEmail } from "../lib/utils.js";
 
 import bcrypt from "bcryptjs";
 
@@ -7,30 +8,20 @@ export const signup = async (request, response) => {
     const { fullName, email, password } = request.body;
     try {
         if (!fullName || !email || !password) {
-            return response.status(400).json({
-                message: "All fields are required"
-            });
-        }
+            return sendErrorResponse(response, 400, "All fields are required");
+        };
 
         if (password.length < 6) {
-            return response.status(400).json({
-                message: "Password must be at least 6 characters"
-            });
-        }
+            return sendErrorResponse(response, 400, "Password must be at least 6 characters");
+        };
 
-        // Validate email format using a regular expression
-        const emailRegex = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
-        if (!emailRegex.test(email)) {
-            return response.status(400).json({
-                message: "Invalid email format"
-            });
-        }
+        if (!validateEmail(email)) {
+            return sendErrorResponse(response, 400, "Invalid email format");
+        };
 
         const user = await User.findOne({ email });
 
-        if (user) return response.status(400).json({
-            message: "Email already exists"
-        });
+        if (user) return sendErrorResponse(response, 400, "Email already exists");
 
         const salt = await bcrypt.genSalt(10)
         const hashedPassword = await bcrypt.hash(password, salt)
@@ -61,9 +52,7 @@ export const signup = async (request, response) => {
 
     } catch (error) {
         console.log("Error in signup controller", error.message);
-        response.status(500).json({
-            message: "Internal Server Error"
-        });
+        sendErrorResponse(response, 500, "Internal Server Error");
     };
 };
 

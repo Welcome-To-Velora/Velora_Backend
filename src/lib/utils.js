@@ -13,4 +13,17 @@ export const generateToken = (userId, response) => {
     });
 
     return token
-} 
+};
+
+
+// Utility function to handle sending error responses
+export const sendErrorResponse = (response, status, message) => {
+    return response.status(status).json({ message });
+};
+
+
+// Utility function for email validation
+export const validateEmail = (email) => {
+    const emailRegex = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+    return emailRegex.test(email);
+};
