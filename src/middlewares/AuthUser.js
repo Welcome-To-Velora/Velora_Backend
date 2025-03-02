@@ -1,43 +1,38 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/UserModel.js';
+import { sendErrorResponse } from '../lib/utils.js';
 
 export const protectRoute = async (request, response, next) => {
     try {
-
-        const token = request.cookies.jwt
+        const token = request.cookies.jwt;
 
         if (!token) {
-            return response.status(401).json({
-                message: "Unauthorized Access"
-            })
+            return sendErrorResponse(response, 401, "Unauthorized Access");
         }
-        
-        const decoded = jwt.verify(token, process.env.JWT_SECRET)
 
-        if (!decoded) {
-            return response.status(401).json({
-                message: "Unauthorized Access"
-            })
-        }
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+        // If verification fails, the error will be thrown and caught in the catch block
 
         const user = await User.findById(decoded.userId).select("-password");
 
         if (!user) {
-            return response.status(404).json({
-                message: "User Not Found"
-            })
+            return sendErrorResponse(response, 404, "User Not Found");
         }
 
-        request.user = user
-        
-        next()
+        request.user = user;  // Attach user to the request object
+        next();
 
     } catch (error) {
-        console.log("Error in protectRoute Middlware", error.message);
-        return response.status(500).json({
-            message: "Internal Server Error"
-        });
-    };
+        console.log("Error in protectRoute Middleware", error.message);
+
+        // Handle specific JWT errors
+        if (error.name === "TokenExpiredError") {
+            return sendErrorResponse(response, 401, "Token expired, Please login again");
+        }
+
+        return sendErrorResponse(response, 500, "Internal Server Error");
+    }
 };
 
 export const adminRoute = (req, res, next) => {
