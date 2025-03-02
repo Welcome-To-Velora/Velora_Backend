@@ -1,8 +1,6 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 
-import { validateEmail, validatePhoneNumber } from "../lib/validators";
-
 // Define User Schema
 const userSchema = new mongoose.Schema({
     // Full Name: Required string
@@ -18,7 +16,10 @@ const userSchema = new mongoose.Schema({
         lowercase: true,
         trim: true,
         validate: {
-            validator: validateEmail,
+            validator: function (email) {
+                // Regular expression to check for a valid email format
+                return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email);
+            },
             message: props => `${props.value} is not a valid email address!` // Custom error message
         }
     },
@@ -27,13 +28,6 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
         minLength: 6,
-    },
-    // Phone Number: Optional but must be numeric and within 10-15 digits
-    phoneNumber: {
-        type: String,
-        trim: true,
-        validate: validatePhoneNumber,
-            message: props => `${props.value} is not a valid phone number!` // Custom error message
     },
     role: {
         type: String,
@@ -44,9 +38,6 @@ const userSchema = new mongoose.Schema({
     // createdAt, updatedAt
     timestamps: true
 });
-
-const User = mongoose.model("User", userSchema);
-
 
 
 // Centralising password logic to make it clean, secure, and maintainable
@@ -73,5 +64,14 @@ userSchema.methods.comparePassword = async function (password) {
     // bcrypt.compare compares the provided password with the hashed password
     return bcrypt.compare(password, this.password); // Returns a promise that resolves to a boolean
 }
+
+// Method to automatically remove password from JSON responses
+userSchema.methods.toJSON = function () {
+    const obj = this.toObject();
+    delete obj.password;
+    return obj;
+};
+
+const User = mongoose.model("User", userSchema);
 
 export default User;
