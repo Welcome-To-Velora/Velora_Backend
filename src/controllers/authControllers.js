@@ -123,5 +123,21 @@ export const login = async (request, response) => {
 
 
 export const logout = async (request, response) => {
-    response.send("Logout Route Called");
+    try {
+        
+        response.cookie("jwt", "", {maxAge:0})
+        response.status(200).json({
+            message: "Logged Out Successfully"
+        });
+
+    } catch (error) {
+        console.log("Error in the logout controller", error.message);
+        response.status(500).json({
+            message: "Internal Server Error"
+        });
+    }
 };
+
+
+
+// TODO: IMPLEMENT GET PROFILE LATER
