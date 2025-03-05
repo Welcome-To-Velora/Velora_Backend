@@ -23,8 +23,8 @@ export const signup = async (request, response) => {
 
         if (user) return sendErrorResponse(response, 400, "Email already exists");
 
-        const salt = await bcrypt.genSalt(10)
-        const hashedPassword = await bcrypt.hash(password, salt)
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
 
         const newUser = new User({
             fullName,
@@ -46,7 +46,7 @@ export const signup = async (request, response) => {
 
         } else {
             sendErrorResponse(response, 400, "Invalid User Data");
-        }
+        };
 
     } catch (error) {
         console.log("Error in signup controller", error.message);
@@ -61,21 +61,21 @@ export const login = async (request, response) => {
         // Check if email and password are provided
         if (!email || !password) {
             return sendErrorResponse(response, 400, "Email and password are required");
-        }
+        };
 
         // Check if user exists
         const user = await User.findOne({ email });
 
         if (!user) {
             return sendErrorResponse(response, 400, "Invalid email or password");
-        }
+        };
 
         // Compare the password with the hashed password
         const isMatch = await bcrypt.compare(password, user.password);
 
         if (!isMatch) {
             return sendErrorResponse(response, 400, "Invalid email or password");
-        }
+        };
 
         // Generate the JWT token (include user role)
         const token = generateToken(user._id, user.role, response);
@@ -87,10 +87,10 @@ export const login = async (request, response) => {
                 message: "Login successful. Redirecting to Admin Dashboard.",
                 redirectTo: "/admin/dashboard", // This is an example; the frontend can handle it
             });
-        }
+        };
 
         // If it's a regular user, send a response without redirecting to admin dashboard
-        response.status(200).json({
+        return response.status(200).json({
             message: "Login successful. Redirecting to user homepage.",
             redirectTo: "/user/home", // For example, regular user homepage
         });
@@ -98,7 +98,7 @@ export const login = async (request, response) => {
     } catch (error) {
         console.log("Error in login controller", error.message);
         sendErrorResponse(response, 500, "Internal Server Error");
-    }
+    };
 };
 
 {/*         This is an example for the frontend on how we would handle the role in the Token and which page to redirect them too :)
@@ -135,7 +135,7 @@ export const logout = async (request, response) => {
         response.status(500).json({
             message: "Internal Server Error"
         });
-    }
+    };
 };
 
 
