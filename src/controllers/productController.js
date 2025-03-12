@@ -31,6 +31,22 @@ export const getFeaturedProducts = async (request, response) => {
     }
 };
 
+export const getProductById = async (request, response) => {
+    try {
+        const product = await Product.findById(request.params.id);
+
+        if (!product) {
+            return sendErrorResponse(response, 404, "Product Not Found");
+        }
+
+        response.json(product);
+
+    } catch (error) {
+        console.log("Error in getProductById controller", error.message);
+        return sendErrorResponse(response, 500, "Internal Server Error");
+    }
+};
+
 export const createProduct = async (request, response) => {
     try {
         const {name, description, price, image, categoryID, dinosaur_type, stock} = request.body;
@@ -50,7 +66,66 @@ export const createProduct = async (request, response) => {
             dinosaur_type,
             stock
         })
+
+        response.status(201).json(product);
+
     } catch (error) {
+        console.log("Error in createProduct Controller", error.message);
+        return sendErrorResponse(response, 500, "Server Error", error.message);
+    }
+};
+
+export const deleteProduct = async (request, response) => {
+    try {
+        const product = await Product.findById(request.params.id);
+
+        if (!product) {
+            return sendErrorResponse(response, 404, "Product Not Found");
+        }
+
+        if (product.image) {
+            const publicId = product.image.split("/").pop().split(".")[0]; // This will get the ID of the image
+            try {
+                await cloudinary.uploader.destroy(`products/${publicId}`);
+                console.log("Deleted image from cloudinary");
+            } catch (error) {
+                console.log("Error deleting image from cloudinary", error);
+            }
+        }
+
+        await Product.findByIdAndDelete(request.params.id);
+
+        response.json({ message: "Product deleted successfully" });
+    } catch (error) {
+        console.log("Error in deleteProduct controller", error.message);
+        return sendErrorResponse(response, 500, "Internal Server Error");
+    }
+};
+
+export const updateProduct = async (request, response) => {
+    try {
+        const {name, description, price, image, categoryID, dinosaur_type, stock} = request.body;
+        let updatedData = { name, description, price, categoryID, dinosaur_type, stock };
+
+        if (image) {
+            let cloudinaryResponse = await cloudinary.uploader.upload(image, { folder: "products" });
+            updatedData.image = cloudinaryResponse.secure_url;
+        }
+
+        const updatedProduct = await Product.findByIdAndUpdate(
+            request.params.id,
+            updatedData,
+            { new: true, runValidators: true }
+        );
+
+        if (!updatedProduct) {
+            return sendErrorResponse(response, 404, "Product Not Found");
+        }
+
+        response.json(updatedProduct);
         
+    } catch (error) {
+        console.log("Error in updateProduct controller", error.message);
+        return sendErrorResponse(response, 500, "Internal Server Error");
     }
 };
