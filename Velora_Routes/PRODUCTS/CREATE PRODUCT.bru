@@ -1,0 +1,23 @@
+meta {
+  name: CREATE PRODUCT
+  type: http
+  seq: 4
+}
+
+post {
+  url: http://localhost:1234/api/products
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Dino Runner Sneakers",
+    "description": "Comfortable sneakers featuring a sleek dinosaur design.",
+    "price": 79.99,
+    "categoryID": "67d109cf1844aec9457894be",
+    "dinosaur_type": "Velociraptor",
+    "stock": 50,
+    "isFeatured": true
+  }
+}

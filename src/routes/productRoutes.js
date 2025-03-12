@@ -14,11 +14,11 @@ const router = express.Router();
 
 router.get("/", protectRoute, adminRoute, getAllProducts);
 router.get("/featured", getFeaturedProducts);
+router.get("/search", searchProducts);
 router.get("/:id", getProductById);
 router.post("/", protectRoute, adminRoute, createProduct);
 router.delete("/:id", protectRoute, adminRoute, deleteProduct);
 router.patch("/:id", protectRoute, adminRoute, updateProduct);
-router.get("/search", searchProducts);
 router.get("/category/:categoryID", getProductsByCategory);
 
 

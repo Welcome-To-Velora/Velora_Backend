@@ -17,10 +17,10 @@ export const getAllProducts = async (request, response) => {
 export const getFeaturedProducts = async (request, response) => {
     try {
         // Fetch Products that are marked as featured
-        const featuredProducts = await Product.find({ isfeatured: true });
+        const featuredProducts = await Product.find({ isFeatured: true });
 
         if (featuredProducts.length === 0) {
-            return sendErrorResponse(response, 404, "No featured products found");
+            return sendErrorResponse(response, 404, "No Featured Products Found");
         }
 
         response.json(featuredProducts);
@@ -49,7 +49,7 @@ export const getProductById = async (request, response) => {
 
 export const createProduct = async (request, response) => {
     try {
-        const {name, description, price, image, categoryID, dinosaur_type, stock} = request.body;
+        const { name, description, price, image, categoryID, dinosaur_type, stock, isFeatured } = request.body;
 
         let cloudinaryResponse = null;
 
@@ -64,7 +64,8 @@ export const createProduct = async (request, response) => {
             image: cloudinaryResponse?.secure_url ? cloudinaryResponse.secure_url : "",
             categoryID,
             dinosaur_type,
-            stock
+            stock,
+            isFeatured
         })
 
         response.status(201).json(product);
@@ -132,16 +133,31 @@ export const updateProduct = async (request, response) => {
 
 export const searchProducts = async (request, response) => {
     try {
-        const { query, category, minPrice, maxPrice, dinosaur_type } = request.query;
+        const { query, category, minPrice, maxPrice, dinosaur_type, isFeatured } = request.query;
 
-    let filters = {};
+        let filters = {};
 
-        if (query) filters.name = { $regex: query, $options: "i" };
-        if (category) filters.categoryID = category;
-        if (minPrice || maxPrice) filters.price = { $gte: minPrice || 0, $lte: maxPrice || Infinity };
-        if (dinosaur_type) filters.dinosaur_type = dinosaur_type;
-
+        if (query) {
+            // Ensure case-insensitive search for product name
+            filters.name = { $regex: query, $options: "i" };
+        }
+        if (category) {
+            filters.categoryID = category;
+        }
+        if (minPrice || maxPrice) {
+            filters.price = { $gte: minPrice || 0, $lte: maxPrice || Infinity };
+        }
+        if (dinosaur_type) {
+            filters.dinosaur_type = dinosaur_type;
+        }
+        if (isFeatured) {
+            filters.isFeatured = isFeatured === "true"; // Boolean check
+        }
         const products = await Product.find(filters);
+
+        if (products.length === 0) {
+            return sendErrorResponse(response, 404, "No products found matching your search");
+        }
 
         response.json(products);
 
@@ -152,5 +168,18 @@ export const searchProducts = async (request, response) => {
 };
 
 export const getProductsByCategory = async (request, response) => {
-    // TBC
+    try {
+        // Fetch products using category ID from URL parameters
+        const products = await Product.find({ categoryID: request.params.categoryID });
+
+        if (products.length === 0) {
+            return sendErrorResponse(response, 404, "No products found for this category");
+        }
+
+        response.json(products);
+
+    } catch (error) {
+        console.log("Error in getProductsByCategory controller", error.message);
+        return sendErrorResponse(response, 500, "Internal Server Error");
+    }
 };

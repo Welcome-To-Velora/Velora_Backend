@@ -1,0 +1,17 @@
+meta {
+  name: UPDATE PRODUCT
+  type: http
+  seq: 6
+}
+
+patch {
+  url: http://localhost:1234/api/products/67d10bf6bb48a5d5df7d669f
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Tee-Rex Hoodie"
+  }
+}

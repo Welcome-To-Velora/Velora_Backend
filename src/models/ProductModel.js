@@ -20,7 +20,7 @@ const productSchema = new mongoose.Schema({
     // Product Image: Required String (cloudinary)
     image: {
         type: String,
-        required: [true, 'Image is required'],
+        // required: [true, 'Image is required'],
     },
     // Category ID: References Category Schema - Required
     categoryID: {

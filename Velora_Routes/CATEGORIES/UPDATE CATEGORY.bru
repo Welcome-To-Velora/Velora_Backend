@@ -1,0 +1,17 @@
+meta {
+  name: UPDATE CATEGORY
+  type: http
+  seq: 4
+}
+
+patch {
+  url: http://localhost:1234/api/categories/67d108601844aec9457894ac
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Roaring Hoodie"
+  }
+}

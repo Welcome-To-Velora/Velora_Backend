@@ -10,7 +10,7 @@ export const protectRoute = async (request, response, next) => {
 
         // If there's no token, return unauthorized error
         if (!token) {
-            return sendErrorResponse(response, 401, "Unauthorized Access - No token provided");
+            return sendErrorResponse(response, 401, "Unauthorized Access - Please Log In");
         }
 
         // Verify the JWT token and decode it
