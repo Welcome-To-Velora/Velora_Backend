@@ -129,3 +129,28 @@ export const updateProduct = async (request, response) => {
         return sendErrorResponse(response, 500, "Internal Server Error");
     }
 };
+
+export const searchProducts = async (request, response) => {
+    try {
+        const { query, category, minPrice, maxPrice, dinosaur_type } = request.query;
+
+    let filters = {};
+
+        if (query) filters.name = { $regex: query, $options: "i" };
+        if (category) filters.categoryID = category;
+        if (minPrice || maxPrice) filters.price = { $gte: minPrice || 0, $lte: maxPrice || Infinity };
+        if (dinosaur_type) filters.dinosaur_type = dinosaur_type;
+
+        const products = await Product.find(filters);
+
+        response.json(products);
+
+    } catch (error) {
+        console.log("Error in searchProducts controller", error.message);
+        return sendErrorResponse(response, 500, "Internal Server Error");
+    }
+};
+
+export const getProductsByCategory = async (request, response) => {
+    // TBC
+};
