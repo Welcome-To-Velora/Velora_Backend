@@ -1,5 +1,7 @@
 import jwt from "jsonwebtoken";
 
+import { Product } from "../models/ProductModel";
+
 export const generateToken = (userId, role, response) => {
     const token = jwt.sign({ userId, role }, process.env.JWT_SECRET, {
         expiresIn: "7d"
@@ -32,4 +34,22 @@ export const sendErrorResponse = (response, status, message) => {
 export const validateEmail = (email) => {
     const emailRegex = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
     return emailRegex.test(email);
+};
+
+// Helper function to find products by ID
+export const findProductById = async (id) => {
+    return await Product.findById(id);
+};
+
+// Helper function to upload images to cloudinary
+export const uploadImageToCloudinary = async (image) => {
+    try {
+        if (!image) return null;
+        
+        const cloudinaryResponse = await cloudinary.uploader.upload(image, { folder: "products" });
+        return cloudinaryResponse.secure_url;
+    } catch (error) {
+        console.error("Cloudinary upload error:", error);
+        throw new Error("Failed to upload image");
+    }
 };

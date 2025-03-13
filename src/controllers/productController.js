@@ -1,8 +1,7 @@
 import cloudinary from "../lib/cloudinary.js";
 
 import { Product } from "../models/ProductModel.js";
-import { Category } from "../models/CategoryModel.js";
-import { handleControllerError } from "../lib/utils.js";
+import { handleControllerError, findProductById, uploadImageToCloudinary } from "../lib/utils.js";
 
 export const getAllProducts = async (request, response) => {
     try {
@@ -31,14 +30,11 @@ export const getFeaturedProducts = async (request, response) => {
 
 export const getProductById = async (request, response) => {
     try {
-        const product = await Product.findById(request.params.id);
-
+        const product = await findProductById(request.params.id);
         if (!product) {
             return sendErrorResponse(response, 404, "Product Not Found");
         }
-
         response.json(product);
-
     } catch (error) {
         return handleControllerError(response, error, "getProductById");
     }
@@ -48,22 +44,18 @@ export const createProduct = async (request, response) => {
     try {
         const { name, description, price, image, categoryID, dinosaur_type, stock, isFeatured } = request.body;
 
-        let cloudinaryResponse = null;
-
-        if(image){
-            cloudinaryResponse = await cloudinary.uploader.upload(image, { folder: "products" })
-        }
+        const imageUrl = await uploadImageToCloudinary(image);
 
         const product = await Product.create({
             name,
             description,
             price,
-            image: cloudinaryResponse?.secure_url ? cloudinaryResponse.secure_url : "",
+            image: imageUrl || "",
             categoryID,
             dinosaur_type,
             stock,
             isFeatured
-        })
+        });
 
         response.status(201).json(product);
 
@@ -74,7 +66,7 @@ export const createProduct = async (request, response) => {
 
 export const deleteProduct = async (request, response) => {
     try {
-        const product = await Product.findById(request.params.id);
+        const product = await findProductById(request.params.id);
 
         if (!product) {
             return sendErrorResponse(response, 404, "Product Not Found");
@@ -100,12 +92,16 @@ export const deleteProduct = async (request, response) => {
 
 export const updateProduct = async (request, response) => {
     try {
-        const {name, description, price, image, categoryID, dinosaur_type, stock} = request.body;
+        const { name, description, price, image, categoryID, dinosaur_type, stock } = request.body;
         let updatedData = { name, description, price, categoryID, dinosaur_type, stock };
 
+        const existingProduct = await findProductById(request.params.id);
+        if (!existingProduct) {
+            return sendErrorResponse(response, 404, "Product Not Found");
+        }
+
         if (image) {
-            let cloudinaryResponse = await cloudinary.uploader.upload(image, { folder: "products" });
-            updatedData.image = cloudinaryResponse.secure_url;
+            updatedData.image = await uploadImageToCloudinary(image);
         }
 
         const updatedProduct = await Product.findByIdAndUpdate(
@@ -114,12 +110,8 @@ export const updateProduct = async (request, response) => {
             { new: true, runValidators: true }
         );
 
-        if (!updatedProduct) {
-            return sendErrorResponse(response, 404, "Product Not Found");
-        }
-
         response.json(updatedProduct);
-        
+
     } catch (error) {
         return handleControllerError(response, error, "updateProduct");
     }
@@ -129,24 +121,16 @@ export const searchProducts = async (request, response) => {
     try {
         const { query, category, minPrice, maxPrice, dinosaur_type, isFeatured } = request.query;
 
-        let filters = {};
+        // Construct filters dynamically
+        const filters = {
+            ...(query && { name: { $regex: query, $options: "i" } }), 
+            ...(category && { categoryID: category }),
+            ...(minPrice || maxPrice ? { price: { $gte: minPrice || 0, $lte: maxPrice || Infinity } } : {}),
+            ...(dinosaur_type && { dinosaur_type }),
+            ...(isFeatured && { isFeatured: isFeatured === "true" }) 
+        };
 
-        if (query) {
-            // Ensure case-insensitive search for product name
-            filters.name = { $regex: query, $options: "i" };
-        }
-        if (category) {
-            filters.categoryID = category;
-        }
-        if (minPrice || maxPrice) {
-            filters.price = { $gte: minPrice || 0, $lte: maxPrice || Infinity };
-        }
-        if (dinosaur_type) {
-            filters.dinosaur_type = dinosaur_type;
-        }
-        if (isFeatured) {
-            filters.isFeatured = isFeatured === "true"; // Boolean check
-        }
+        // Fetch products based on filters
         const products = await Product.find(filters);
 
         if (products.length === 0) {
