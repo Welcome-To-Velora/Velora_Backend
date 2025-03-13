@@ -2,15 +2,14 @@ import cloudinary from "../lib/cloudinary.js";
 
 import { Product } from "../models/ProductModel.js";
 import { Category } from "../models/CategoryModel.js";
-import { sendErrorResponse } from "../lib/utils.js";
+import { handleControllerError } from "../lib/utils.js";
 
 export const getAllProducts = async (request, response) => {
     try {
         const products = await Product.find({}); // Find all products
         response.json({ products });
     } catch (error) {
-        console.log("Error in the getAllProducts controller", error.message);
-        return sendErrorResponse(response, 500, "Internal Server Error");
+        return handleControllerError(response, error, "getAllProducts");
     }
 };
 
@@ -26,8 +25,7 @@ export const getFeaturedProducts = async (request, response) => {
         response.json(featuredProducts);
 
     } catch (error) {
-        console.log("Error in getFeaturedProducts Controller");
-        return sendErrorResponse(response, 500, "Internal Server Error");
+        return handleControllerError(response, error, "getFeaturedProducts");
     }
 };
 
@@ -42,8 +40,7 @@ export const getProductById = async (request, response) => {
         response.json(product);
 
     } catch (error) {
-        console.log("Error in getProductById controller", error.message);
-        return sendErrorResponse(response, 500, "Internal Server Error");
+        return handleControllerError(response, error, "getProductById");
     }
 };
 
@@ -71,8 +68,7 @@ export const createProduct = async (request, response) => {
         response.status(201).json(product);
 
     } catch (error) {
-        console.log("Error in createProduct Controller", error.message);
-        return sendErrorResponse(response, 500, "Server Error", error.message);
+        return handleControllerError(response, error, "createProduct");
     }
 };
 
@@ -98,8 +94,7 @@ export const deleteProduct = async (request, response) => {
 
         response.json({ message: "Product deleted successfully" });
     } catch (error) {
-        console.log("Error in deleteProduct controller", error.message);
-        return sendErrorResponse(response, 500, "Internal Server Error");
+        return handleControllerError(response, error, "deleteProduct");
     }
 };
 
@@ -126,8 +121,7 @@ export const updateProduct = async (request, response) => {
         response.json(updatedProduct);
         
     } catch (error) {
-        console.log("Error in updateProduct controller", error.message);
-        return sendErrorResponse(response, 500, "Internal Server Error");
+        return handleControllerError(response, error, "updateProduct");
     }
 };
 
@@ -162,8 +156,7 @@ export const searchProducts = async (request, response) => {
         response.json(products);
 
     } catch (error) {
-        console.log("Error in searchProducts controller", error.message);
-        return sendErrorResponse(response, 500, "Internal Server Error");
+        return handleControllerError(response, error, "searchProducts");
     }
 };
 
@@ -179,7 +172,6 @@ export const getProductsByCategory = async (request, response) => {
         response.json(products);
 
     } catch (error) {
-        console.log("Error in getProductsByCategory controller", error.message);
-        return sendErrorResponse(response, 500, "Internal Server Error");
+        return handleControllerError(response, error, "getProductsByCategory");
     }
 };

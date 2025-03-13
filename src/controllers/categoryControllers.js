@@ -1,5 +1,5 @@
 import { Category } from "../models/CategoryModel.js";
-import { sendErrorResponse } from "../lib/utils.js";
+import { handleControllerError } from "../lib/utils.js";
 
 export const getAllCategories = async (request, response) => {
     try {
@@ -7,8 +7,7 @@ export const getAllCategories = async (request, response) => {
         response.json(categories);
 
     } catch (error) {
-        console.log("Error in getAllCategories", error.message);
-        return sendErrorResponse(response, 500, "Internal Server Error");
+        return handleControllerError(response, error, "getAllCategories");
     }
 };
 
@@ -22,8 +21,7 @@ export const getCategoryById = async (request, response) => {
 
         response.json(category);
     } catch (error) {
-        console.log("Error in getCategoryById controller", error.message);
-        return sendErrorResponse(response, 500, "Internal Server Error");
+        return handleControllerError(response, error, "getCategoryById");
     }
 };
 
@@ -40,8 +38,7 @@ export const createCategory = async (request, response) => {
         const newCategory = await Category.create({ name });
         response.status(201).json(newCategory);
     } catch (error) {
-        console.log("Error in createCategory controller", error.message);
-        return sendErrorResponse(response, 500, "Internal Server Error");
+        return handleControllerError(response, error, "createCategory");
     }
 };
 
@@ -61,8 +58,7 @@ export const updateCategory = async (request, response) => {
 
         response.json(updatedCategory);
     } catch (error) {
-        console.log("Error in updateCategory controller", error.message);
-        return sendErrorResponse(response, 500, "Internal Server Error");
+        return handleControllerError(response, error, "updateCategory");
     }
 };
 
@@ -76,8 +72,7 @@ export const deleteCategory = async (request, response) => {
 
         response.json({ message: "Category deleted successfully" });
     } catch (error) {
-        console.log("Error in deleteCategory controller", error.message);
-        return sendErrorResponse(response, 500, "Internal Server Error");
+        return handleControllerError(response, error, "deleteCategory");
     }
 };
 

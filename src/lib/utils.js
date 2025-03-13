@@ -16,7 +16,13 @@ export const generateToken = (userId, role, response) => {
 };
 
 
-// Utility function to handle sending error responses
+// Utility function to handle sending Status 500 error responses
+export const handleControllerError = (response, error, location) => {
+    console.error(`Error in ${location}:`, error.message);
+    return sendErrorResponse(response, 500, "Internal Server Error", error.message);
+};
+
+// Utility function for sending error responses
 export const sendErrorResponse = (response, status, message) => {
     return response.status(status).json({ message });
 };

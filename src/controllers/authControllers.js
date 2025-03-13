@@ -1,6 +1,6 @@
 import User from "../models/UserModel.js";
 import { generateToken } from "../lib/utils.js";
-import { sendErrorResponse, validateEmail } from "../lib/utils.js";
+import { handleControllerError, sendErrorResponse, validateEmail } from "../lib/utils.js";
 
 import bcrypt from "bcryptjs";
 
@@ -49,8 +49,7 @@ export const signup = async (request, response) => {
         };
 
     } catch (error) {
-        console.log("Error in signup controller", error.message);
-        sendErrorResponse(response, 500, "Internal Server Error");
+        return handleControllerError(response, error, "signup");
     };
 };
 
@@ -96,8 +95,7 @@ export const login = async (request, response) => {
         });
 
     } catch (error) {
-        console.log("Error in login controller", error.message);
-        sendErrorResponse(response, 500, "Internal Server Error");
+        return handleControllerError(response, error, "login");
     };
 };
 
@@ -131,13 +129,6 @@ export const logout = async (request, response) => {
         });
 
     } catch (error) {
-        console.log("Error in the logout controller", error.message);
-        response.status(500).json({
-            message: "Internal Server Error"
-        });
+        return handleControllerError(response, error, "logout");
     };
 };
-
-
-
-// TODO: IMPLEMENT GET PROFILE LATER
