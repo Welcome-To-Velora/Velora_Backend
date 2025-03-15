@@ -32,7 +32,8 @@ const cartSchema = new mongoose.Schema({
     totalPrice: {
         type: Number,
         required: true,
-        default: 0
+        default: 0,
+        min: [0, "Total price cannot be negative"],
     }
 }, { timestamps: true });
 
