@@ -1,0 +1,17 @@
+meta {
+  name: UPDATE CART
+  type: http
+  seq: 3
+}
+
+patch {
+  url: http://localhost:1234/api/cart/update/67d10bf6bb48a5d5df7d669f
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "quantity": 3
+  }
+}

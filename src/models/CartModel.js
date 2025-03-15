@@ -10,6 +10,7 @@ const cartSchema = new mongoose.Schema({
     items: [
         {
             // Product ID: References Product Schema - Required
+            _id: false,
             productID: {
                 type: mongoose.Schema.Types.ObjectId,
                 ref: "Product",
@@ -34,6 +35,7 @@ const cartSchema = new mongoose.Schema({
         required: true,
         default: 0,
         min: [0, "Total price cannot be negative"],
+        set: (v) => parseFloat(v.toFixed(2)),
     }
 }, { timestamps: true });
 

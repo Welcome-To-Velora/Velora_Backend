@@ -1,0 +1,18 @@
+meta {
+  name: ADD TO CART
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://localhost:1234/api/cart/add
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "productID": "67d54d4596c42eacacf6da8a",
+    "quantity": 2
+  }
+}
