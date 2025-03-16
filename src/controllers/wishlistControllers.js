@@ -90,11 +90,7 @@ export const removeFromWishlist = async (request, response) => {
 export const clearWishlist = async (request, response) => {
     try {
         const userID = request.user.id;
-
-        const wishlist = await Wishlist.findOne({ userID });
-        if (!wishlist) {
-            return sendErrorResponse(response, 404, "Wishlist not found");
-        }
+        const wishlist = await getWishlistByUserID(userID);
 
         wishlist.products = [];
 
@@ -104,6 +100,7 @@ export const clearWishlist = async (request, response) => {
             message: "Wishlist cleared",
             wishlist
         });
+        
     } catch (error) {
         return handleControllerError(response, error, "clearWishlist");
     }
