@@ -2,8 +2,6 @@ import { Review } from "../models/ReviewModel.js";
 import { Product } from "../models/ProductModel.js";
 import { handleControllerError, sendErrorResponse, findUserReview } from "../lib/utils.js";
 
-console.log(Review);
-
 export const addReview = async (request, response) => {
     try {
         const { productID } = request.params;
