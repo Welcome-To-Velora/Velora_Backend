@@ -59,3 +59,17 @@ export const uploadImageToCloudinary = async (image) => {
 export const findUserReview = async (productID, userID) => {
     return await Review.findOne({ productID, userID });
 };
+
+// Helper function to get the wishlist for a user
+export const getWishlistByUserID = async (userID) => {
+    const wishlist = await Wishlist.findOne({ userID }).populate("products");
+    if (!wishlist) {
+        throw new Error("Wishlist not found");
+    }
+    return wishlist;
+};
+
+// Helper function to check if a product is already in the wishlist
+export const isProductInWishlist = (wishlist, productID) => {
+    return wishlist.products.some(p => p.productID.toString() === productID);
+};

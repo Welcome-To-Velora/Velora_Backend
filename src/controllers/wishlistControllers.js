@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import { Wishlist } from "../models/WishlistModel.js";
 import { Product } from "../models/ProductModel.js";
-import { sendErrorResponse, handleControllerError } from "../lib/utils.js";
+import { sendErrorResponse, handleControllerError, getWishlistByUserID, isProductInWishlist } from "../lib/utils.js";
 
 export const addToWishlist = async (request, response) => {
     try {
@@ -25,7 +25,7 @@ export const addToWishlist = async (request, response) => {
                 }]
             });
         } else {
-            if (wishlist.products.some(p => p.productID.toString() === productID)) {
+            if (isProductInWishlist(wishlist, productID)) {
                 return sendErrorResponse(response, 400, "Product already in your wishlist");
             }
 
@@ -52,11 +52,7 @@ export const addToWishlist = async (request, response) => {
 export const getWishlist = async (request, response) => {
     try {
         const userID = request.user.id;
-
-        const wishlist = await Wishlist.findOne({ userID }).populate("products");
-        if (!wishlist) {
-            return sendErrorResponse(response, 404, "Wishlist Not Found");
-        }
+        const wishlist = await getWishlistByUserID(userID);
 
         return response.status(200).json(wishlist);
 
@@ -65,18 +61,15 @@ export const getWishlist = async (request, response) => {
     }
 };
 
-export const removeFromWishlist = async (req, res) => {
+export const removeFromWishlist = async (request, response) => {
     try {
-        const userID = req.user.id;
-        const { productID } = req.params;
+        const userID = request.user.id;
+        const { productID } = request.params;
 
-        const wishlist = await Wishlist.findOne({ userID });
-        if (!wishlist) {
-            return sendErrorResponse(res, 404, "Wishlist not found");
-        }
+        const wishlist = await getWishlistByUserID(userID);
 
-        if (!wishlist.products.some(p => p.productID.toString() === productID)) {
-            return sendErrorResponse(res, 404, "Product not found in wishlist");
+        if (!isProductInWishlist(wishlist, productID)) {
+            return sendErrorResponse(response, 404, "Product not found in wishlist");
         }
 
         wishlist.products = wishlist.products.filter(
@@ -85,12 +78,12 @@ export const removeFromWishlist = async (req, res) => {
 
         await wishlist.save();
 
-        return res.status(200).json({
+        return response.status(200).json({
             message: "Product removed from wishlist",
             wishlist
         });
     } catch (error) {
-        return handleControllerError(res, error, "removeFromWishlist");
+        return handleControllerError(response, error, "removeFromWishlist");
     }
 };
 
