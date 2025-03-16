@@ -1,0 +1,18 @@
+meta {
+  name: CREATE REVIEW
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:1234/api/reviews/67d10bf6bb48a5d5df7d669f
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "rating": 5,
+    "reviewComment": "Amazing product! Loved it."
+  }
+}

@@ -25,7 +25,6 @@ const ReviewSchema = new mongoose.Schema({
     { timestamps: true }
 );
 
-// Prevents duplicate reviews from the same user or a product
-ReviewSchema.index({ productID: 1, userID: 1, }, { unique: true });
+ReviewSchema.index({ productID: 1, userID: 1 }, { unique: true });
 
 export const Review = mongoose.model("Review", ReviewSchema);
