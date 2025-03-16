@@ -53,3 +53,8 @@ export const uploadImageToCloudinary = async (image) => {
         throw new Error("Failed to upload image");
     }
 };
+
+// Helper function to find a product review
+export const findUserReview = async (productID, userID) => {
+    return await Review.findOne({ productID, userID });
+};
