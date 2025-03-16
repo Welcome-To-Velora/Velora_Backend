@@ -1,6 +1,6 @@
 import express from "express";
 
-import { protectRoute, adminRoute } from "../middlewares/AuthUser.js";
+import { protectRoute } from "../middlewares/AuthUser.js";
 import { addReview, 
         getProductReviews,
         deleteReview,

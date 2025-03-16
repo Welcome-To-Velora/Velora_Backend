@@ -7,7 +7,7 @@ export const getCart = async (request, response) => {
         const cart = await Cart.findOne({ userID: request.user.id })
             .populate({
                 path: "items.productID",
-                select: "name price image" // Only fetch necessary fields
+                select: "name price image" 
             });
 
         if (!cart) return sendErrorResponse(response, 404, "Cart Not Found");
@@ -21,38 +21,34 @@ export const getCart = async (request, response) => {
 export const addToCart = async (request, response) => {
     try {
       const { productID, quantity } = request.body;
-      const userID = request.user.id; // Assuming you're using authentication
+      const userID = request.user.id;
   
-      // 🔹 Fetch product to get the price
       const product = await Product.findById(productID);
       if (!product) {
         return sendErrorResponse(response, 404, "Product Not Found");
       }
   
-      // 🔹 Find the user's cart or create a new one
       let cart = await Cart.findOne({ userID });
   
       if (!cart) {
         cart = new Cart({ userID, items: [] });
       }
   
-      // 🔹 Check if item already exists in cart
       const existingItem = cart.items.find((item) => item.productID.equals(productID));
   
       if (existingItem) {
-        existingItem.quantity += quantity; // Update quantity
+        existingItem.quantity += quantity; 
       } else {
-        // 🔹 Add new item with `priceAtTime`
+       
         cart.items.push({
           productID,
           quantity,
-          priceAtTime: product.price, // Ensure price is added
+          priceAtTime: product.price, 
         });
       }
   
-      // 🔹 Save cart and send response
       await cart.save();
-      response.status(200).json(cart);
+      return response.status(200).json(cart);
     } catch (error) {
       return handleControllerError(response, error, "addToCart");
     }
@@ -74,7 +70,7 @@ export const updateCartItem = async (request, response) => {
         cart.totalPrice = cart.items.reduce((sum, item) => sum + item.quantity * item.priceAtTime, 0);
 
         await cart.save();
-        response.status(200).json(cart);
+        return response.status(200).json(cart);
     } catch (error) {
         return handleControllerError(response, error, "updateCartItem");
     }
@@ -89,19 +85,16 @@ export const removeFromCart = async (request, response) => {
 
         const initialItemCount = cart.items.length;
 
-        // Filter out the item
         cart.items = cart.items.filter(item => item.productID.toString() !== productID);
 
-        // Check if an item was actually removed
         if (cart.items.length === initialItemCount) {
             return sendErrorResponse(response, 400, "Item Not Found in Cart");
         }
 
-        // Recalculate total price
         cart.totalPrice = cart.items.reduce((sum, item) => sum + item.quantity * item.priceAtTime, 0);
 
         await cart.save();
-        response.status(200).json("Item Removed Successfully");
+        return response.status(200).json("Item Removed Successfully");
     } catch (error) {
         return handleControllerError(response, error, "removeFromCart");
     }
@@ -116,7 +109,7 @@ export const clearCart = async (request, response) => {
         cart.totalPrice = 0;
         await cart.save();
 
-        response.status(200).json({ message: "Cart cleared successfully" });
+        return response.status(200).json({ message: "Cart cleared successfully" });
     } catch (error) {
         return handleControllerError(response, error, "clearCart");
     }

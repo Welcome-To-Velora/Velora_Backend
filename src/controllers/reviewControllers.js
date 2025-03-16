@@ -6,7 +6,7 @@ export const addReview = async (request, response) => {
     try {
         const { productID } = request.params;
         const { rating, reviewComment } = request.body;
-        const userID = request.user.id;
+        const { userID } = request.user.id;
 
         if (!await Product.exists({ _id: productID })) {
             return sendErrorResponse(response, 404, "Product Not Found");
@@ -42,7 +42,7 @@ export const getProductReviews = async (request, response) => {
 export const deleteReview = async (request, response) => {
     try {
         const { productID } = request.params;
-        const userID = request.user.id;
+        const { userID } = request.user.id;
         
         const review = await findUserReview(productID, userID);
         if (!review) {
