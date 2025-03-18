@@ -7,6 +7,7 @@ import categoryRoutes from "./routes/categoryRoutes.js";
 import cartRoutes from "./routes/cartRoutes.js";
 import reviewRoutes from "./routes/reviewRoutes.js";
 import wishlistRoutes from "./routes/wishlistRoutes.js";
+import stripeRoutes from "./routes/stripeRoutes.js";
 
 import { connectDB } from "./lib/db.js"
 import cookieParser from "cookie-parser";
@@ -23,6 +24,7 @@ app.use("/api/categories", categoryRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/wishlist", wishlistRoutes);
+app.use("/api/stripe", stripeRoutes);
 
 
 
