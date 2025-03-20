@@ -1,0 +1,21 @@
+meta {
+  name: CREATE PAYMENT
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:1234/api/payment
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+      "order": "67dc239afd13efc065d3d124",
+      "user": "67c4032f66519ab76d7620ae",
+      "amount": 159.98,
+      "paymentMethod": "Card",
+      "transactionId": "txn_123456"
+  }
+}

@@ -62,15 +62,21 @@ export const getOrderById = async (request, response) => {
 // Update order status
 export const updateOrderStatus = async (request, response) => {
     try {
-        const order = await Order.findById(request.params.id);
+        const { status } = request.body;
+        const order = await Order.findById(request.params.id).populate("payment");
+
         if (!order) {
             return sendErrorResponse(response, 404, "Order Not Found");
         }
 
-        order.status = request.body.status || order.status;
-        const updatedOrder = await order.save();
+        if (status === "Shipped" && (!order.payment || order.payment.status !== "Completed")) {
+            return sendErrorResponse(response, 400, "Order Cannot Be Shipped Without A Completed Payment");
+        }
 
-        return response.status(200).json(updatedOrder);
+        order.status = status;
+        await order.save();
+
+        return response.status(200).json({ message: "Order status updated successfully", order });
     } catch (error) {
         return handleControllerError(response, error, "updateOrderStatus");
     }
