@@ -1,50 +1,44 @@
 import mongoose from "mongoose";
 
-const orderSchema = new mongoose.Schema({
-    user: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-        required: true,
-    },
-    products: [
-        {
-            product: {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: "Product",
-                required: true,
-            },
-            quantity: {
-                type: Number,
-                required: true,
-                min: 1,
-            },
-            price: {
-                type: Number,
-                required: true,
-                min: 0,
-            },
+const orderSchema = new mongoose.Schema(
+    {
+        user: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            required: true,
         },
-    ],
-    totalAmount: {
-        type: Number,
-        required: true,
-        min: 0,
+        products: [
+            {
+                product: {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: "Product",
+                    required: true,
+                },
+                quantity: {
+                    type: Number,
+                    required: true,
+                    min: 1,
+                },
+                price: {
+                    type: Number,
+                    required: true,
+                    min: 0,
+                },
+            },
+        ],
+        totalAmount: {
+            type: Number,
+            required: true,
+            min: 0,
+        },
+        status: {
+            type: String,
+            enum: ["Pending", "Processing", "Shipped", "Delivered", "Cancelled"],
+            default: "Pending",
+        },
     },
-    stripeSessionId: {
-        type: String,
-        unique: true,
-    },
-    paymentStatus: {
-        type: String,
-        enum: ["Pending", "Paid", "Failed"],
-        default: "Pending",
-    },
-    paymentMethod: {
-        type: String,
-        enum: ["Card", "PayPal", "Other"],
-    },
-},
-{ timestamps: true });
+    { timestamps: true }
+);
 
 const Order = mongoose.model("Order", orderSchema);
 
