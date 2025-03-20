@@ -1,22 +1,35 @@
-import { handleControllerError, sendErrorResponse } from "../lib/utils";
+import { handleControllerError, sendErrorResponse } from "../lib/utils.js";
 import Order from "../models/OrderModel.js";
+import { Cart } from "../models/CartModel.js";
 
-// Create an Order
-export const createOrder = async (request, response) => {
+export const createOrderFromCart = async (request, response) => {
     try {
-        const { user, products, totalAmount } = request.body;
+        const userId = request.user.id;
+        
+        const cart = await Cart.findOne({ userID: userId }).populate("items.productID");
+        if (!cart || cart.items.length === 0) {
+            return response.status(400).json({ message: "Your cart is empty" });
+        }
 
-        const newOrder = new Order({
-            user,
-            products,
-            totalAmount,
+        const order = new Order({
+            user: userId,
+            products: cart.items.map(item => ({
+                product: item.productID._id,
+                quantity: item.quantity,
+                price: item.priceAtTime,
+            })),
+            totalAmount: cart.totalPrice,
+            paymentStatus: "Pending",
+            paymentMethod: "Other",
         });
 
-        const savedOrder = await newOrder.save();
-        return response.status(201).json(savedOrder);
+        await order.save();
 
+        await Cart.findOneAndUpdate({ userID: userId }, { items: [], totalPrice: 0 });
+
+        return response.status(201).json({ message: "Order placed successfully", order });
     } catch (error) {
-        return handleControllerError(response, error, "createOrder");
+        return handleControllerError(response, error, "createOrderFromCart");
     }
 };
 

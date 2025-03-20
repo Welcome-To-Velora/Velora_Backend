@@ -31,10 +31,14 @@ const orderSchema = new mongoose.Schema(
             required: true,
             min: 0,
         },
-        status: {
+        paymentStatus: {
             type: String,
             enum: ["Pending", "Processing", "Shipped", "Delivered", "Cancelled"],
             default: "Pending",
+        },
+        paymentMethod: {
+            type: String,
+            enum: ["Card", "PayPal", "Other"],
         },
     },
     { timestamps: true }
