@@ -3,8 +3,7 @@ import request from 'supertest';
 import app from '../src/server.js';
 import User from '../src/models/UserModel.js'; 
 import { validateEmail } from '../src/lib/utils.js';
-import { uploadImageToCloudinary } from './path/to/uploadImageToCloudinary';
-import cloudinary from 'cloudinary';
+
 
 let server;
 
