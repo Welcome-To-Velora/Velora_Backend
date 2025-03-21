@@ -1,0 +1,18 @@
+meta {
+  name: UPDATE REVIEW
+  type: http
+  seq: 4
+}
+
+put {
+  url: http://localhost:1234/api/reviews/67dcc9962dd03c46b288dd17
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+      "rating": 4,
+      "reviewComment": "Great product! Improved quality."
+  }
+}

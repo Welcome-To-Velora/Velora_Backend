@@ -33,9 +33,9 @@ export const signup = async (request, response) => {
         });
 
         if (newUser) {
-            // Generate JWT here with user ID and role
-            generateToken(newUser._id, newUser.role, response);
             await newUser.save();
+            generateToken(newUser._id, newUser.role, response);
+            
 
             return sendSuccessResponse(response, 201, "User created successfully", {
                 _id: newUser._id,
@@ -127,4 +127,88 @@ export const logout = async (request, response) => {
     } catch (error) {
         return handleControllerError(response, error, "logout");
     };
+};
+
+export const getAllUsers = async (request, response) => {
+    try {
+        const users = await User.find().select("-password");
+
+        if (users.length === 0) {
+            return sendErrorResponse(response, 404, "No Users Found");
+        }
+
+        return sendSuccessResponse(response, 200, "Users Retrieved Successfully", users);
+
+    } catch (error) {
+        return handleControllerError(response, error, "getAllUsers");
+    }
+};
+
+
+export const getUserById = async (request, response) => {
+    try {
+        const userId = request.params.id;
+
+    const user = await User.findById(userId).select("-password");
+    if (!user) {
+        return sendErrorResponse(response, 404, "User Not Found");
+    }
+
+    return sendSuccessResponse(response, 200, "User Retrieved Successfully", user);
+
+    } catch (error) {
+        return handleControllerError(response, error, "getUserById");    
+    }
+};
+
+
+export const updateUser = async (request, response) => {
+    const userId = request.params.id;
+    const { fullName, email, password, role } = request.body;
+
+    try {
+        // Check if the user exists
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return sendErrorResponse(response, 404, "User not found");
+        }
+
+        if (role && request.user.role !== 'admin') {
+            return sendErrorResponse(response, 403, "Permission denied: Only admins can change roles");
+        }
+
+        if (fullName) user.fullName = fullName;
+        if (email) user.email = email;
+        if (password) {
+            const salt = await bcrypt.genSalt(10);
+            user.password = await bcrypt.hash(password, salt);
+        }
+        if (role) user.role = role; 
+
+        await user.save();
+
+        return sendSuccessResponse(response, 200, "User updated successfully", user);
+        
+    } catch (error) {
+        return handleControllerError(response, error, "updateUser");
+    }
+};
+
+export const deleteUser = async (request, response) => {
+    try {
+        const userId = request.params.id;
+
+        const user = await User.findById(userId);
+        if (!user) {
+            return sendErrorResponse(response, 404, "User not found");
+        }
+
+        await user.deleteOne();
+
+        return sendSuccessResponse(response, 200, "User deleted successfully");
+
+    } catch (error) {
+        return handleControllerError(response, error, "deleteUser");
+    }
 };

@@ -6,7 +6,7 @@ export const addReview = async (request, response) => {
     try {
         const { productID } = request.params;
         const { rating, reviewComment } = request.body;
-        const { userID } = request.user;
+        const userID = request.user.id;
 
         if (!await Product.exists({ _id: productID })) {
             return sendErrorResponse(response, 404, "Product Not Found");
@@ -32,6 +32,10 @@ export const getProductReviews = async (request, response) => {
         const { productID } = request.params;
         const reviews = await Review.find({ productID }).populate("userID", "fullName");
 
+        if (reviews.length === 0) {
+            return sendSuccessResponse(response, 200, "No reviews found for this product", []);
+        }
+
         return sendSuccessResponse(response, 200, "Reviews Retrieved Successfully", reviews);
 
     } catch (error) {
@@ -41,15 +45,44 @@ export const getProductReviews = async (request, response) => {
 
 export const deleteReview = async (request, response) => {
     try {
-        const { productID } = request.params;
-        const { userID } = request.user.id;
-        
-        const review = await findUserReview(productID, userID);
+        const reviewID = request.params.reviewID; 
+        if (!reviewID) {
+            return sendErrorResponse(response, 400, "Review ID is required");
+        }
 
-        await review.deleteOne(); // More direct deletion
-        return sendSuccessResponse(response, 200, "Review Deleted Successfully");
+        const review = await Review.findById(reviewID);
+        if (!review) {
+            return sendErrorResponse(response, 404, "Review not found");
+        }
 
+        await review.deleteOne();
+
+        return sendSuccessResponse(response, 200, "Review deleted successfully");
     } catch (error) {
         return handleControllerError(response, error, "deleteReview");
+    }
+};
+
+
+export const updateReview = async (request, response) => {
+    try {
+        const reviewID = request.params.id;
+        const { rating, reviewComment } = request.body;  
+
+        const review = await Review.findById(reviewID);
+
+        if (!review) {
+            return sendErrorResponse(response, 404, "Review not found");
+        }
+
+        if (rating) review.rating = rating;  
+        if (reviewComment) review.reviewComment = reviewComment; 
+
+        await review.save();
+
+        return sendSuccessResponse(response, 200, "Review Updated Successfully", review);
+
+    } catch (error) {
+        return handleControllerError(response, error, "updateReview");
     }
 };

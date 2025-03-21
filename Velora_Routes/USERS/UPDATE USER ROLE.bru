@@ -1,0 +1,17 @@
+meta {
+  name: UPDATE USER ROLE
+  type: http
+  seq: 8
+}
+
+put {
+  url: http://localhost:1234/api/auth/67c4032f66519ab76d7620ae
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "role": "user"
+  }
+}

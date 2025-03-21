@@ -88,10 +88,7 @@ export const uploadImageToCloudinary = async (image) => {
 // Helper function to find a product review
 export const findUserReview = async (productID, userID) => {
     const review = await Review.findOne({ productID, userID });
-    if (!review) {
-        return sendErrorResponse(response, 404, "Review Not Found");
-    }
-    return review;
+    return review; 
 };
 
 // Helper function to get the wishlist for a user
