@@ -1,10 +1,10 @@
 import { Category } from "../models/CategoryModel.js";
-import { handleControllerError } from "../lib/utils.js";
+import { handleControllerError, sendErrorResponse, sendSuccessResponse } from "../lib/utils.js";
 
 export const getAllCategories = async (request, response) => {
     try {
         const categories = await Category.find({});
-        response.json(categories);
+        return sendSuccessResponse(response, 200, "Categories retrieved successfully", categories);
 
     } catch (error) {
         return handleControllerError(response, error, "getAllCategories");
@@ -19,7 +19,7 @@ export const getCategoryById = async (request, response) => {
             return sendErrorResponse(response, 404, "Category Not Found");
         }
 
-        response.json(category);
+        return sendSuccessResponse(response, 200, "Category retrieved successfully", category);
     } catch (error) {
         return handleControllerError(response, error, "getCategoryById");
     }
@@ -36,7 +36,7 @@ export const createCategory = async (request, response) => {
         }
 
         const newCategory = await Category.create({ name });
-        response.status(201).json(newCategory);
+        return sendSuccessResponse(response, 201, "Category Created successfully", newCategory);
     } catch (error) {
         return handleControllerError(response, error, "createCategory");
     }
@@ -56,7 +56,7 @@ export const updateCategory = async (request, response) => {
             return sendErrorResponse(response, 404, "Category Not Found");
         }
 
-        response.json(updatedCategory);
+        return sendSuccessResponse(response, 200, "Category Updated successfully", updateCategory);
     } catch (error) {
         return handleControllerError(response, error, "updateCategory");
     }
@@ -70,7 +70,7 @@ export const deleteCategory = async (request, response) => {
             return sendErrorResponse(response, 404, "Category Not Found");
         }
 
-        response.json({ message: "Category deleted successfully" });
+        return sendSuccessResponse(response, 200, "Category Deleted successfully");
     } catch (error) {
         return handleControllerError(response, error, "deleteCategory");
     }

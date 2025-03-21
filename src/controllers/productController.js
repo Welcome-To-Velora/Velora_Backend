@@ -1,12 +1,13 @@
 import cloudinary from "../lib/cloudinary.js";
 
 import { Product } from "../models/ProductModel.js";
-import { handleControllerError, findProductById, uploadImageToCloudinary } from "../lib/utils.js";
+import { handleControllerError, sendErrorResponse, sendSuccessResponse, findProductById, uploadImageToCloudinary } from "../lib/utils.js";
 
 export const getAllProducts = async (request, response) => {
     try {
         const products = await Product.find({}); // Find all products
-        response.json({ products });
+        return sendSuccessResponse(response, 200, "Products Retrieved Successfully", products);
+
     } catch (error) {
         return handleControllerError(response, error, "getAllProducts");
     }
@@ -21,7 +22,7 @@ export const getFeaturedProducts = async (request, response) => {
             return sendErrorResponse(response, 404, "No Featured Products Found");
         }
 
-        response.json(featuredProducts);
+        return sendSuccessResponse(response, 200, "Featured Products Retrieved Successfully", featuredProducts);
 
     } catch (error) {
         return handleControllerError(response, error, "getFeaturedProducts");
@@ -31,10 +32,10 @@ export const getFeaturedProducts = async (request, response) => {
 export const getProductById = async (request, response) => {
     try {
         const product = await findProductById(request.params.id);
-        if (!product) {
-            return sendErrorResponse(response, 404, "Product Not Found");
-        }
-        response.json(product);
+        if (!product) return;
+
+        return sendSuccessResponse(response, 200, "Product Retrieved Successfully", product);
+
     } catch (error) {
         return handleControllerError(response, error, "getProductById");
     }
@@ -57,7 +58,8 @@ export const createProduct = async (request, response) => {
             isFeatured
         });
 
-        response.status(201).json(product);
+        return sendSuccessResponse(response, 201, "Product Created Successfully", product);
+
 
     } catch (error) {
         return handleControllerError(response, error, "createProduct");
@@ -67,10 +69,7 @@ export const createProduct = async (request, response) => {
 export const deleteProduct = async (request, response) => {
     try {
         const product = await findProductById(request.params.id);
-
-        if (!product) {
-            return sendErrorResponse(response, 404, "Product Not Found");
-        }
+        if (!product) return;
 
         if (product.image) {
             const publicId = product.image.split("/").pop().split(".")[0]; // This will get the ID of the image
@@ -84,7 +83,8 @@ export const deleteProduct = async (request, response) => {
 
         await Product.findByIdAndDelete(request.params.id);
 
-        response.json({ message: "Product deleted successfully" });
+        return sendSuccessResponse(response, 200, "Product Deleted Successfully");
+
     } catch (error) {
         return handleControllerError(response, error, "deleteProduct");
     }
@@ -96,9 +96,7 @@ export const updateProduct = async (request, response) => {
         let updatedData = { name, description, price, categoryID, dinosaur_type, stock };
 
         const existingProduct = await findProductById(request.params.id);
-        if (!existingProduct) {
-            return sendErrorResponse(response, 404, "Product Not Found");
-        }
+        if (!existingProduct) return;
 
         if (image) {
             updatedData.image = await uploadImageToCloudinary(image);
@@ -110,7 +108,7 @@ export const updateProduct = async (request, response) => {
             { new: true, runValidators: true }
         );
 
-        response.json(updatedProduct);
+        return sendSuccessResponse(response, 200, "Product Updated Successfully", updatedProduct);
 
     } catch (error) {
         return handleControllerError(response, error, "updateProduct");
@@ -137,7 +135,7 @@ export const searchProducts = async (request, response) => {
             return sendErrorResponse(response, 404, "No products found matching your search");
         }
 
-        response.json(products);
+        return sendSuccessResponse(response, 200, "Products Retrieved Successfully", products);
 
     } catch (error) {
         return handleControllerError(response, error, "searchProducts");
@@ -153,7 +151,7 @@ export const getProductsByCategory = async (request, response) => {
             return sendErrorResponse(response, 404, "No products found for this category");
         }
 
-        response.json(products);
+        return sendSuccessResponse(response, 200, "Products Retrieved Successfully", products);
 
     } catch (error) {
         return handleControllerError(response, error, "getProductsByCategory");

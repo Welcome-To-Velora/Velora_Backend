@@ -1,4 +1,4 @@
-import { handleControllerError, sendErrorResponse } from "../lib/utils.js";
+import { handleControllerError, sendErrorResponse, sendSuccessResponse } from "../lib/utils.js";
 import Order from "../models/OrderModel.js";
 import { Cart } from "../models/CartModel.js";
 
@@ -8,7 +8,7 @@ export const createOrderFromCart = async (request, response) => {
         
         const cart = await Cart.findOne({ userID: userId }).populate("items.productID");
         if (!cart || cart.items.length === 0) {
-            return response.status(400).json({ message: "Your cart is empty" });
+            return sendErrorResponse(response, 400, "Your Cart Is Empty");
         }
 
         const order = new Order({
@@ -27,7 +27,8 @@ export const createOrderFromCart = async (request, response) => {
 
         await Cart.findOneAndUpdate({ userID: userId }, { items: [], totalPrice: 0 });
 
-        return response.status(201).json({ message: "Order placed successfully", order });
+        return sendSuccessResponse(response, 201, "Order Created Successfully", order);
+
     } catch (error) {
         return handleControllerError(response, error, "createOrderFromCart");
     }
@@ -37,7 +38,7 @@ export const createOrderFromCart = async (request, response) => {
 export const getOrders = async (request, response) => {
     try {
         const orders = await Order.find().populate("user", "name email").populate("products.product", "name price");
-        return response.status(201).json(orders);
+        return sendSuccessResponse(response, 200, "Orders Retrieved Successfully", orders);
 
     } catch (error) {
         return handleControllerError(response, error, "getOrders");
@@ -52,7 +53,7 @@ export const getOrderById = async (request, response) => {
             return sendErrorResponse(response, 404, "Order Not Found");
         }
 
-        return response.status(200).json(order);
+        return sendSuccessResponse(response, 200, "Order Retrieved Successfully", order);
 
     } catch (error) {
         return handleControllerError(response, error, "getOrderById");
@@ -76,7 +77,8 @@ export const updateOrderStatus = async (request, response) => {
         order.status = status;
         await order.save();
 
-        return response.status(200).json({ message: "Order status updated successfully", order });
+        return sendSuccessResponse(response, 200, "Orders Status Updated Successfully", order);
+
     } catch (error) {
         return handleControllerError(response, error, "updateOrderStatus");
     }
@@ -86,7 +88,8 @@ export const updateOrderStatus = async (request, response) => {
 export const deleteOrder = async (request, response) => {
     try {
         await Order.findByIdAndDelete(request.params.id);
-        return response.status(200).json({ message: "Order deleted successfully" });
+        return sendSuccessResponse(response, 200, "Order Deleted Successfully");
+
     } catch (error) {
         return handleControllerError(response, error, "deleteOrder");
     }

@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import { Wishlist } from "../models/WishlistModel.js";
 import { Product } from "../models/ProductModel.js";
-import { sendErrorResponse, handleControllerError, getWishlistByUserID, isProductInWishlist } from "../lib/utils.js";
+import { sendErrorResponse, handleControllerError, sendSuccessResponse, getWishlistByUserID, isProductInWishlist } from "../lib/utils.js";
 
 export const addToWishlist = async (request, response) => {
     try {
@@ -39,10 +39,8 @@ export const addToWishlist = async (request, response) => {
 
         await wishlist.save();
 
-        return response.status(201).json({
-            message: "Product added to wishlist",
-            wishlist
-        });
+        return sendSuccessResponse(response, 200, "Added To Wishlist Successfully", wishlist);
+
     } catch (error) {
         return handleControllerError(response, error, "addToWishlist");
     }
@@ -54,7 +52,7 @@ export const getWishlist = async (request, response) => {
         const userID = request.user.id;
         const wishlist = await getWishlistByUserID(userID);
 
-        return response.status(200).json(wishlist);
+        return sendSuccessResponse(response, 200, "Wishlist Retieved Successfully", wishlist);
 
     } catch (error) {
         return handleControllerError(response, error, "getWishlist");
@@ -78,10 +76,8 @@ export const removeFromWishlist = async (request, response) => {
 
         await wishlist.save();
 
-        return response.status(200).json({
-            message: "Product removed from wishlist",
-            wishlist
-        });
+        return sendSuccessResponse(response, 200, "Deleted From Wishlist Successfully", wishlist);
+
     } catch (error) {
         return handleControllerError(response, error, "removeFromWishlist");
     }
@@ -96,10 +92,8 @@ export const clearWishlist = async (request, response) => {
 
         await wishlist.save();
 
-        return response.status(200).json({
-            message: "Wishlist cleared",
-            wishlist
-        });
+        return sendSuccessResponse(response, 200, "Wishlist Cleared Successfully", wishlist);
+
         
     } catch (error) {
         return handleControllerError(response, error, "clearWishlist");

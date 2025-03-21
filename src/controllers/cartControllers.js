@@ -1,6 +1,6 @@
 import { Cart } from "../models/CartModel.js";
 import { Product } from "../models/ProductModel.js";
-import { handleControllerError, sendErrorResponse, findProductById } from "../lib/utils.js";
+import { handleControllerError, sendErrorResponse, sendSuccessResponse } from "../lib/utils.js";
 
 export const getCart = async (request, response) => {
     try {
@@ -12,7 +12,7 @@ export const getCart = async (request, response) => {
 
         if (!cart) return sendErrorResponse(response, 404, "Cart Not Found");
 
-        response.status(200).json(cart);
+        return sendSuccessResponse(response, 200, "Cart retrieved successfully", cart);
     } catch (error) {
         return handleControllerError(response, error, "getCart");
     }
@@ -48,7 +48,7 @@ export const addToCart = async (request, response) => {
       }
   
       await cart.save();
-      return response.status(200).json(cart);
+      return sendSuccessResponse(response, 201, "Added To Cart", cart);
     } catch (error) {
       return handleControllerError(response, error, "addToCart");
     }
@@ -70,7 +70,7 @@ export const updateCartItem = async (request, response) => {
         cart.totalPrice = cart.items.reduce((sum, item) => sum + item.quantity * item.priceAtTime, 0);
 
         await cart.save();
-        return response.status(200).json(cart);
+        return sendSuccessResponse(response, 200, "Updated Cart Successfully", cart);
     } catch (error) {
         return handleControllerError(response, error, "updateCartItem");
     }
@@ -94,7 +94,7 @@ export const removeFromCart = async (request, response) => {
         cart.totalPrice = cart.items.reduce((sum, item) => sum + item.quantity * item.priceAtTime, 0);
 
         await cart.save();
-        return response.status(200).json("Item Removed Successfully");
+        return sendSuccessResponse(response, 200, "Item Removed Successfully", cart);
     } catch (error) {
         return handleControllerError(response, error, "removeFromCart");
     }
@@ -109,7 +109,7 @@ export const clearCart = async (request, response) => {
         cart.totalPrice = 0;
         await cart.save();
 
-        return response.status(200).json({ message: "Cart cleared successfully" });
+        return sendSuccessResponse(response, 200, "Cart Cleared Successfully", cart);
     } catch (error) {
         return handleControllerError(response, error, "clearCart");
     }

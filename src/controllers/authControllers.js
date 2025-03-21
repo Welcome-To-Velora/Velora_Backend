@@ -1,6 +1,6 @@
 import User from "../models/UserModel.js";
 import { generateToken } from "../lib/utils.js";
-import { handleControllerError, sendErrorResponse, validateEmail } from "../lib/utils.js";
+import { handleControllerError, sendErrorResponse, sendSuccessResponse, validateEmail } from "../lib/utils.js";
 
 import bcrypt from "bcryptjs";
 
@@ -37,7 +37,7 @@ export const signup = async (request, response) => {
             generateToken(newUser._id, newUser.role, response);
             await newUser.save();
 
-            response.status(201).json({
+            return sendSuccessResponse(response, 201, "User created successfully", {
                 _id: newUser._id,
                 fullName: newUser.fullName,
                 email: newUser.email,
@@ -82,16 +82,14 @@ export const login = async (request, response) => {
         // Send response with the user data and redirect to the appropriate dashboard
         if (user.role === 'admin') {
             // Redirect admin to dashboard (or send a URL to the frontend)
-            return response.status(200).json({
-                message: "Login successful. Redirecting to Admin Dashboard.",
-                redirectTo: "/admin/dashboard", // This is an example; the frontend can handle it
+            return sendSuccessResponse(response, 200, "Login successful. Redirecting to Admin Dashboard.", {
+                redirectTo: "/admin/dashboard",
             });
         };
 
         // If it's a regular user, send a response without redirecting to admin dashboard
-        return response.status(200).json({
-            message: "Login successful. Redirecting to user homepage.",
-            redirectTo: "/user/home", // For example, regular user homepage
+        return sendSuccessResponse(response, 200, "Login successful. Redirecting to User Homepage.", {
+            redirectTo: "/user/home",
         });
 
     } catch (error) {
@@ -124,9 +122,7 @@ export const logout = async (request, response) => {
     try {
         
         response.cookie("jwt", "", {maxAge:0})
-        response.status(200).json({
-            message: "Logged Out Successfully"
-        });
+        return sendSuccessResponse(response, 200, "Logged Out Successfully");
 
     } catch (error) {
         return handleControllerError(response, error, "logout");
