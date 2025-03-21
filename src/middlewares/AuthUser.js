@@ -2,6 +2,9 @@ import jwt from 'jsonwebtoken';
 import User from '../models/UserModel.js';
 import { sendErrorResponse } from '../lib/utils.js';
 
+import dotenv from 'dotenv';
+dotenv.config(); 
+
 export const protectRoute = async (request, response, next) => {
     try {
         // Access the JWT token from cookies

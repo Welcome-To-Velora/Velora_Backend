@@ -13,6 +13,7 @@ import paymentRoutes from "./routes/paymentRoutes.js";
 import { connectDB } from "./lib/db.js"
 import cookieParser from "cookie-parser";
 
+
 dotenv.config();
 
 const app = express();
@@ -27,7 +28,6 @@ app.use("/api/reviews", reviewRoutes);
 app.use("/api/wishlist", wishlistRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/payment", paymentRoutes);
-
 
 
 // Test Routes
