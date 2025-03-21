@@ -4,15 +4,29 @@
 
 ### What is Velora?
 
-Velora is a one-of-a-kind e-commerce app designed for adults who adore dinosaur-themed clothing. Our mission is to combine fun, creativity, and quality in a way that resonates with your unique style. Whether you're a fan of bold prints, subtle designs, or minimalist nods to prehistoric favourites, Velora has something for everyone.
-
-Velora’s MERN stack (MongoDB, Express.js, React, Node.js) E-Commerce store will effectively use both OOP and FP. This will allow us to create a well-structured and efficient e-commerce store. We have successfully completed the backend with all relevant and implemented technologies below.
+Velora is a one-of-a-kind e-commerce platform designed for adults who adore dinosaur-themed clothing. Combining creativity and style with high-quality fabrics, Velora offers a wide range of clothing, from bold dinosaur prints to subtle, minimalist designs. Whether you’re into expressive patterns or just a fan of the prehistoric era, Velora provides a collection that lets you stand out in style. Built with the MERN stack (MongoDB, Express.js, React, Node.js), this backend is designed to support seamless user authentication, shopping cart management, order processing, and much more.
 
 ## Technologies Used
 
 ### 1. Node.js
 
 - **Purpose**: Node.js is a JavaScript runtime environment that allows the server-side execution of JavaScript. It is designed to build scalable, real-time applications by supporting non-blocking, asynchronous programming, making it ideal for high-concurrency applications like e-commerce.
+
+- **Example**:
+
+```
+    const http = require('http');
+    const server = http.createServer((req, res) => {
+    res.statusCode = 200;
+    res.setHeader('Content-Type', 'text/plain');
+    res.end('Welcome to Velora!');
+    });
+
+    server.listen(3000, () => {
+    console.log('Server running at http://localhost:3000/');
+    });
+```
+
 - **Industry Relevance**: Node.js is one of the most widely used backend technologies, especially for API-driven and real-time applications. It is highly preferred for developing fast and scalable applications, particularly in e-commerce platforms like Velora, which require high performance and responsiveness.
 - **Comparison to Alternatives**: Compared to Python (Django/Flask) and PHP (Laravel), Node.js excels in handling high traffic and concurrent requests efficiently due to its non-blocking, event-driven architecture. This is particularly beneficial for real-time applications or services where speed is crucial.
 - **License**: Node.js is released under the MIT License, which permits modification, distribution, and private use without restrictions.
